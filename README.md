@@ -164,6 +164,12 @@ let x=0
 
 - null 和 undefined不能调用方法
 
+### 数值字面量
+
+Number是javascript的主要数值类型，用于表示整数和近似实数
+
+js使用 `IEEE754` 标准
+
 ### IEEE-754标准
 
 JavaScript 的数字是 IEEE-754 标准存储的双精度浮点数类型。
@@ -201,6 +207,8 @@ JavaScript 的数字是 IEEE-754 标准存储的双精度浮点数类型。
     ```
 
     换算为十进制为 `2^-1023*1.0` ，是一个小到可以忽略不计的极小值
+
+### 二进制浮点数与舍入错误
 
 - **Number.MAX_SAFE_INTEGER**
 
@@ -318,28 +326,198 @@ JavaScript 的数字是 IEEE-754 标准存储的双精度浮点数类型。
     0.8 * 2 => 1.6, 1
     0.6 * 2 => 1.2, 1
     ...
-    复制代码
     ```
-
+    
     一样出现了循环 `0011`，第一个数字 1 出现在第二位，尾码往前移动两位，阶码为 `-2`。所以 `0.3` 的二进制形式如下：
-
+    
     ```js
     0 01111111101 0011001100110011001100110011001100110011001100110011
-    复制代码
     ```
-
+    
     和 `0.1 + 0.2` 的运算结果确实不相等
 
-  
-
-
-
-### 数值字面量
-
-Number是javascript的主要数值类型，用于表示整数和近似实数
-
-js使用 `IEEE754` 标准
 
 ### js算数运算
 
-### 二进制浮点数与舍入错误
+运算符：`+`，`-`，`*`，`/`，`%`，`&`，`|`，`**`
+
+Math类提供的函数
+
+```
+pow,round,ceil,floor,abs,random,...
+```
+
+**算术运算的注意点**
+
+- javascript中的算数在遇到**上溢出、下溢出或被0除**时候不会发生错误
+- 数值操作结果超过最大可表示数值（**上溢出**）为`infinity`，负无穷为`-infinity`
+- **下溢出**发生在数值操作结果比最小可表示数值更接近0，此时js返回0，如果下溢出来自负数，则返回`-0`
+
+```js
+console.log(0 / 14);//0
+console.log(14 / 0);//Infinity
+console.log(-14 / 0);//-Infinity
+console.log(0 / 0);//NaN
+console.log(Number.isFinite(Infinity));//false
+//Number.isFinite 判断数据是数值还是无穷，数值：true，无穷：false
+```
+
+**！！！+0与-0几乎无法区分**
+
+```
+0==-0//true
+0===-0//true
+```
+
+可以使用`Object.is()`来判断
+
+```
+Object.is(0,-0)//false
+```
+
+### BigInt
+
+ES2020新增，主要是为了表示**64位整数**
+
+**BigInt字面量**（默认10为基数，可添加前缀）
+
+```js
+1234n		//一个普通BigInt字面量
+0b111111n	//二进制BigInt
+0o111n		//八进制BigInt
+0x800000n	//64位整数
+```
+
+可以使用`BigInt()`函数把常规Javascript数值或字符串转为BigInt值
+
+```js
+BigInt(Number.MAX_SAFE_INTEGER)//900719925474099
+let str="1"+"0".repeat(100)		//1后跟100个0
+BigInt(str)						//10n**100n：一个64位整数
+```
+
+**！！！标准的操作符可以用于BigInt，但不能混用BigInt操作数和常规数值操作数**
+
+**！！！Math对象的任何函数都不接收BigInt操作数**
+
+```js
+2/2n	//Uncaught TypeError TypeError: Cannot mix BigInt and other types, use explicit conversions
+Math.floor(3n)	//Uncaught TypeError TypeError: Cannot convert a BigInt value to a number
+```
+
+**但是允许比较操作符混合操作数类型**
+
+```js
+1<2n	//true
+```
+
+BigInt值的算术运算与常规JavaScript数值算数运算类似，只不过**除法会丢弃余数并且会向下（向0）舍入**
+
+```js
+3000n / 997n	//3n，商是3
+//3000/997=3.009027...
+```
+
+### 日期和时间
+
+主要就是Date对象，其数值表示形式叫时间戳，即1970年1月1日起至今的毫秒数
+
+```js
+let timestamp=Date.now();	//当前的时间戳
+let now=new Date();			//当前时间的日期对象
+let ms=now.getTime();		//转换为毫秒时间戳
+let iso=now.toISOString();	//转换为标准格式字符串
+```
+
+### 字符码点与字符串
+
+- js使用unicode字符集的UTF-16编码，故js字符串是无符号16位值的序列
+
+- 一个码点（codepoint）是16位的
+
+**码点超出16位问题**
+
+码点超出16位的Unicode字符集使用UTF-16规则编码为两个16位值的序列
+
+**！！！这意味着一个长度为2的js字符串可能表示的是一个unicode字符**
+
+```js
+let love="❤"	//❤的UTF-16编码是"\ud83d\udc99"
+```
+
+- js的字符串操作方法一般操作的是**16位值（一个码点），而不是字符**
+  - 也就是说这些js方法不会对超过一个码点的特殊字符进行特殊处理（归一化）
+
+解决：
+
+- 在es6中，字符串是可迭代的，可以对字符串使用 `for...of` 循环或者 `...` 扩展运算符得到字符的迭代而不是16位码点
+
+### 字符串字面量与转义字符
+
+- js中可以把字符串放在一对匹配的单引号，双引号或者反引号中（支持嵌套）
+
+```js
+'test'
+"name"
+`hwt`
+'yes my name is "hwt"'
+```
+
+- 早期版本要求字符串字面量必须写在一行，使用+来拼接
+
+```js
+let str = 'one '+
+'two '+
+'three';
+console.log(str);
+```
+
+- es5之后可以在每行末尾添加一个反斜杠（\）
+
+```js
+let str = 'one \
+two \
+three';
+console.log(str);
+```
+
+- 反斜杠还可以和后面的既定字符组合，形成转义序列
+
+```js
+\0		//NUL字符
+\t		//水平制表符
+\n		//换行符
+\\n		//反斜杠+n
+\'		//单引号
+\"		//双引号
+\r		//回车符
+...
+e.g.
+'you\'re right!'
+//you're right! 
+```
+
+### 标签化模板字面量
+
+如果在开头的反引号前有一个函数名（标签），那么模板字面量中的文本和表达式值将作为参数传递给这个函数
+
+```js
+const tag = function (str) {
+    console.log(str[0]);//传递过来是一个对象如下图
+};
+tag`'one two three\n'`;
+//'one two three
+//'
+```
+
+![image-20221104155705949](README.assets/image-20221104155705949.png)
+
+ES6内置一个标签函数：String.row()
+
+返回反引号中未经处理的文本，即不会进行任何转义
+
+```js
+console.log(String.raw`'one two three\n'`);
+//'one two three\n'
+```
+
