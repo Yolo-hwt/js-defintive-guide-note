@@ -521,3 +521,6 @@ console.log(String.raw`'one two three\n'`);
 //'one two three\n'
 ```
 
+### 布尔值
+
+布尔值表示真或假：**true / false**
