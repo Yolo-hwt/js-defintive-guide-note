@@ -160,6 +160,16 @@ let x=0
 
 ### null和undefined
 
+null可以看成一种特殊的对象，表示没有对象
+
+undefined也表示值不存在，但却更加深层次
+
+```ini
+1.变量值未初始化
+2.查询不存在的对象属性或数组
+3.没有明确返回值的函数
+```
+
 - null和undefined是原始值
 
 - null 和 undefined不能调用方法
@@ -524,3 +534,63 @@ console.log(String.raw`'one two three\n'`);
 ### 布尔值
 
 布尔值表示真或假：**true / false**
+
+javascript的任何值都可以转换为布尔值，假值会被转换为false
+
+```js
+//假值
+undefined
+null
+0
+-0
+NaN
+""
+```
+
+除了假值之外的其他值都可以被转换为`true`
+
+```js
+Boolean([])	//true
+```
+
+布尔值可以使用toStirng方法将自己转化为"true"或"false"
+
+### 符号symbol
+
+- ES6新增的一种原始类型
+
+- Symbol没有字面量语法，要获取一个Symbol值需要使用`Symbol()`函数
+- Symbol函数**永远不会返回相同的值**
+
+为了定义一些可以与其他代码共享的符号值，js定义了一个**全局符号注册表**
+
+`symbol.for()`函数接收一个字符串，返回一个与该字符串相联的符号值（若没有则创建一个新符号）,这点区别于`Symbol()`
+
+```js
+let s=Symbol.for("shared");
+let t=Symbol.for("shared");
+s===t;				//true
+s.toString();		//"Symbol(shared)"
+Symbol.keyFor(t);	//"shared"
+```
+
+### 全局对象
+
+**全局对象的属性是全局性定义的标识符**，可以在javascript程序的任何地方使用
+
+js解析器启动后（如每次浏览器加载新页面），都会创建一个新的全局对象并添加一组初始的属性
+
+类似如下
+
+```ini
+undefined\Infinity\NaN		//全局常量
+isNaN()\parseInt()\eval()	//全局函数
+Date()\RegExp()\String()	//构造函数
+Math\JSON					//全局对象
+```
+
+- 在node中全局对象有一个名为`global`的属性，值为全局对象本身
+- 在浏览器中Window对象充当全局对象角色，这个Window对象有一个自引用的`window`属性
+- Worker线程中的代码可以通过`self`来引用他们的全局对象
+
+**ES2020**最终定义了`globalThis`作为在任何上下文中引用全局对象的标准方式
