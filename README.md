@@ -1,7 +1,7 @@
 # js-defintive-guide-note
-A few things about learing javascript-defintive-guide
+A few things about learning javascript-defintive-guide
 
-# 犀牛书learing
+# 犀牛书learning
 
 本书的书名包含**“权威”**二字是认真的
 
@@ -685,7 +685,7 @@ var声明变量一些值得注意的点
 
 - 函数体外使用var，则声明全局变量
 
-  - 与使用let const 声明的全局变量区别在于，**通过var声明全局变量作为全局对象的属性**，可以通过globalThis引用，**通过let\const声明的全局变量和常量不是全局对象的属性**
+  - 与使用let const 声明的全局变量区别在于，**通过var声明全局变量作为全局对象的属性**，可以通过**globalThis**引用，**通过let\const声明的全局变量和常量不是全局对象的属性**
 
     ```
     //函数外部写
@@ -696,7 +696,7 @@ var声明变量一些值得注意的点
 
     ![image-20221129211636059](README.assets/image-20221129211636059.png)
 
-  - 和直接globalThis声明的属性也有所区别，**使用var创建的属性不能用delete删除**（隐式全局变量也可以使用delete删除）
+  - 和直接globalThis声明的属性也有所区别，**使用var创建的属性不能用delete删除**（隐式全局变量可以使用delete删除）
 
     ![image-20221129211723862](README.assets/image-20221129211723862.png)
 
@@ -704,7 +704,7 @@ var声明变量一些值得注意的点
 
     ![image-20221129211806198](README.assets/image-20221129211806198.png)
 
-- var 可以重复声明同名变量
+- var 可以**重复声明同名变量**
 
 ### 解构赋值
 
@@ -767,3 +767,138 @@ let {hws:hxy,hwt:hrq}={hwt:22,hws:10};
 //hrq:22,hxy:10
 ```
 
+## 第四章 表达式与操作符
+
+**表达式**是一个可以被求值并产生一个值的javascript短语，复杂表达式由简单表达式构成。
+
+最简单的表达式称为**主表达式**（独立存在，不再包含更简单表达式的表达式）
+
+基于简单表达式构建复杂表达式最常见的方式是使用**操作符**
+
+### 对象和数组初始化程序
+
+数组初始化程序是一个包含在方括号内的逗号分隔的表达式列表
+
+```js
+let matrix=[[1,2,3],[4,5,6]];
+//省略逗号间的值可以包含未定义元素
+let sparseArray=[1,,,5]
+```
+
+数组初始化程序中的元素表达式在每次数组初始化程序被求值时候也会被求值
+
+对象初始化程序表达式与数组类似，方括号变为花括号，支持对象字面量的嵌套
+
+```js
+let p={a:{a1:1}};
+```
+
+### 属性访问表达式
+
+属性访问表达式求值为对象属性或数组元素的值，故javascript定义了两种访问属性的语法
+
+```js
+expression.identifier		//表达式指定对象，标识符指定属性名
+expression[expression]		//表达式（对象或数组）后跟另一个位于方括号中的表达式（对象属性名或数组元素索引）
+```
+
+**！！！**无论哪种访问方式，位于`'.'`或者`‘[’`前面的表达式都会先求值
+
+！！！若求值结果为null或undefined则表达式会抛出TyprError（因为他们是js中**不能有属性的两个值**）
+
+两种访问表达式，加标识符的语法更加简单，但通过它访问的属性名称必须是合法的，如果属性名中包含空格或标点字符或者是一个数值（对于数组而言），则必须用方括号语法
+
+![image-20230111144508704](README.assets/image-20230111144508704.png)
+
+### 条件式属性访问
+
+ES2020新增了两个新的属性访问表达式
+
+```
+expression ?. identifier
+expression ?.[ expression ]
+```
+
+这两个属性访问表达式可以看作是原本的两种属性表达式的扩展
+
+解决了左侧表达式求值后为null or undefined 导致抛出 TypeError的问题
+
+![image-20230111145056791](README.assets/image-20230111145056791.png)
+
+这类属性访问表达式适用于长的链式访问
+
+```js
+let a={b:null}
+a.b?.c.d	//undefined
+```
+
+a.b值为undefined，所以`?.`返回了undefined来作为整个表达式的值，子表达式`.c.d`则不会被求值，换句话说，由于a.b为未定义，则后续c,d无论谁有副效应都不会发生
+
+```js
+let a;
+let index=0;
+try {
+	a[index++];
+}catch(e){
+	console.log(index)	//1
+}
+a?.[index++]			//undefined
+//这里在?.访问符返回undefined之后，后续运算则没有发生，故index++并没有发生运算，index值还是1
+console.log(index)		//1
+```
+
+下面这种情况则抛出TypeError
+
+```js
+(a.b?.c).d
+//TypeError
+```
+
+因为(a.b?.c)抛出undefined，处理同样可以通过`?.`
+
+```js
+(a.b?.c)?.d		//undefined
+```
+
+### 调用表达式
+
+调用表达式时js中调用（或执行）函数或方法的一种语法
+
+```
+f(0)
+Math.max(x,y,z)
+...
+```
+
+求值调用表达式时，先求值函数表达式，然后求值参数表达式产生参数值的列表
+
+如果在第一步求函数表达式时并不是一个函数，则抛出TypeError
+
+![image-20230111151838507](README.assets/image-20230111151838507.png)
+
+定义函数a之后，表达式正确执行
+
+```js
+function a(){
+    for(const i of arguments){
+    console.log(i);
+    }
+    //return 'end a'
+}
+```
+
+![image-20230111152110707](README.assets/image-20230111152110707.png)
+
+而此时由于定义的函数体内并没有return语句，则返回undefined
+
+如在a函数函数体末尾内加上
+
+```js
+return 'end a'
+```
+
+再次运行表达式得到
+
+![image-20230111152422072](README.assets/image-20230111152422072.png)
+
+### 条件式调用
