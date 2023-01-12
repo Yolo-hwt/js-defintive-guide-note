@@ -870,7 +870,7 @@ Math.max(x,y,z)
 ...
 ```
 
-求值调用表达式时，先求值函数表达式，然后求值参数表达式产生参数值的列表
+求值调用表达式时，**先求值函数表达式，然后求值参数表达式**产生参数值的列表
 
 如果在第一步求函数表达式时并不是一个函数，则抛出TypeError
 
@@ -889,7 +889,7 @@ function a(){
 
 ![image-20230111152110707](README.assets/image-20230111152110707.png)
 
-而此时由于定义的函数体内并没有return语句，则返回undefined
+而此时由于定义的**函数体内并没有return语句，则返回undefined**
 
 如在a函数函数体末尾内加上
 
@@ -901,4 +901,66 @@ return 'end a'
 
 ![image-20230111152422072](README.assets/image-20230111152422072.png)
 
+**属性访问表达式运用在调用表达式中，称为方法调用**
+
+在属性访问表达式中，作为属性访问主体的对象或者数组在执行函数体时会变成 `this` 关键字的值
+
+```js
+class MyFunc{
+    constructor(name){
+        this.name=name;
+    }
+    func1(){
+        console.log('your name is '+this.name);
+        return 'func1 end'
+    }
+}
+let temp=new MyFunc('hwt');
+temp?.func1();
+```
+
+上述代码运行结果为
+
+![image-20230112113113620](README.assets/image-20230112113113620.png)
+
+
+
 ### 条件式调用
+
+在ES2020中可以使用`?.()`来调用函数
+
+如果?左侧的表达式为null或者undefined不会抛出TypeError，而是直接返回整个表达式值为undefined
+
+```js
+let f=null,x=0;
+try{
+	f(x++);				//f为null，抛出TypeError错误
+}catch(e){
+	console.log(x);		//1，抛出异常前x++执行了
+}
+//使用条件式调用
+let res=f?.(x++);				//f为null，直接返回undefined，且不执行后续代码
+console.log(res);				//undefined
+console.log(x);					//1
+```
+
+### 区别方法调用与函数调用
+
+```
+o.m()		//常规属性访问+常规调用
+o?.m()		//条件式属性访问+常规调用
+o.m?.()		//常规属性访问+条件式调用
+```
+
+- 第一种方式：
+  - o必须为一个对象，且必须有一个名称为m的属性，m是一个函数
+  - 方式一报错TypeError：o为null或undefined；m不为函数；没有m属性或m为null或undefined
+
+- 第二种方式：
+  - 条件式属性访问，o可以为null或undefined，此时表达式值为undefined，为其他合法值必须有m属性且m为函数
+  - 方式二报错TypeError：m不为函数；没有m属性或m为null或undefined
+
+- 第三种方式：
+  - o不能为null或undefined，是则报错，可以没有m属性或m属性为null，此时表达式值为undefined
+  - 方式二报错TypeError：o为null或undefined；m不为函数
+
