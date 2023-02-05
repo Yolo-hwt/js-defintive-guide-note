@@ -1500,3 +1500,135 @@ eval("3+2")		//5
   - 严格模式下eval**基于私有变量环境进行局部求值**，被求值代码**可以查询和设置局部变量**，但**不能在局部作用域中定义新变量或函数**
   - 严格模式下，eval作为保留字
 
+### 其他操作符(?:\??\typeof\delete\await\void\，)
+
+- **条件运算符（?:）**
+
+  - ```ini
+    val_1 ? val_2 : val_3
+    ```
+
+  - 也称为三元运算符（有三个操作数）
+
+  - 第一个操作数被求值解释为布尔值，为真则求值并返回第二个操作数，否则返回第三个操作数值
+
+
+
+- **先定义操作符(??)**
+
+操作符求值其先定义的操作数，如果左侧不是null或undefined就返回该值，否则返回右侧操作数的值
+
+```js
+a??b
+//等价于
+(a !== null && a !== undefined) ? a : b
+```
+
+??是对于||的一个有用的替代，适合选择先定义的操作数，而不是第一个真值的操作数
+
+```js
+let max = maxWidth || preferences.maxWidth || 500
+//如果maxWidth=0被判定为假值，那么或运算符便会继续往下考察下一个值
+//使用??替换后
+let max = maxWidth ?? preferences.maxWidth ?? 500
+//即使maxWidth为0也能成为有效值被选中
+```
+
+！！！只有当某一操作数为**”缺值“**时候（即null/undefined）才会求值返回第二个操作数
+
+ES2020定义了??操作符，并命名为**“缺值合并”（nullish coalescing）**操作符
+
+
+
+- **typeof操作符**
+  - 除对函数之外的所有对象和数组，typeof求值为"object"
+  - typeof null 结果为"object"，区分null和对象必须显示测试
+
+！！！可以只用**typeof来区分对象和其他原始类型**，若要区分不同对象的类，则使用instanceof
+
+```
+typeof val
+```
+
+typeof的操作数可以为任意类型，返回一个字符串表明操作数的类型
+
+表4-3为所有javascript值在应用typeof后对应返回值（见pages目录）
+
+使用示例
+
+```js
+(typeof value === "string") ? "'" +value+ "'" : value.toString()
+//如果value是字符串就将它包裹在''内，如果不是则将其转为字符串
+```
+
+
+
+- **delete操作符**
+
+一元操作符，尝试删除其操作数指定的对象属性或数组元素
+
+使用delete操作符通常也是**为了发挥其属性删除的副效应**
+
+delete**期待他的操作数是一个左值**，若不为左值则什么也不做返回true，否则delete尝试删除指定的左值，删除成功返回true
+
+**删除属性**
+
+删除属性后该属性便不存在，尝试读取不存在的属性返回undefined
+
+![image-20230204142609695](README.assets/image-20230204142609695.png)
+
+**删除数组**
+
+删除数组则使用undefined替换被删除数组元素，可以理解为在数组中留下了一个”坑“，结果导致了一个稀疏数组
+
+![image-20230204142742865](README.assets/image-20230204142742865.png)
+
+示例
+
+```js
+let o={x:1,y:1};
+delete o.x;			//删除对象的属性x，返回true
+typeof o.x;			//属性不存在，返回"undefined"
+delete o.x;			//删除不存在的属性，返回true
+delete 1;			//没有意义，但返回true
+delete o;			//不能删除变量，返回false
+delete Object.prototype;	//不可删除的属性，返回false
+```
+
+
+
+- **await操作符**
+
+ES2017增加，用于完善js中的异步编程，使其更加自然
+
+await期待一个Promise对象，作为其唯一操作数
+
+await只能出现在通过async关键字声明为异步的函数中
+
+
+
+- **void操作符**
+
+一元操作符，**求值自己的操作数，然后丢弃这个值并返回undefined**
+
+只有在操作数有副效应时才有必要使用void
+
+```js
+let counter = 0;
+const increment = () => void counter++;
+increment()						//undefined
+console.log(counter)			//1
+```
+
+
+
+- **逗号操作符(，)**
+
+二元操作符，这个操作符会求值左右两边操作数，然后返回右操作数的值
+
+```js
+i=0, j=1, k=2
+//结果等价于
+i=0; j=1; k=2
+```
+
