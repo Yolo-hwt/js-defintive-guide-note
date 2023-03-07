@@ -1632,3 +1632,110 @@ i=0, j=1, k=2
 i=0; j=1; k=2
 ```
 
+##  第五章 语句
+
+JavaScript就是一系列待执行的语句，语句以分号结尾
+
+### 表达式语句
+
+- 最简单的一种语句就是**有副效应的表达式**
+
+​	常见的有：赋值语句、递增递减操作符，他们都有修改变量值的副效应
+
+​	**delete**操作符有删除对象属性或数组元素的副效应，所以一般把他作为一个语句使用，而不是放在某个大的表达式中
+
+- 函数调用是另一类主要的表达式语句
+
+### 复合语句与空语句
+
+- 复合语句就是使用**“{}”**语句块将多个语句组合为一个复合语句，其实就是一系列的语句
+
+  - 语句块不以分号结尾，块中的语句以分号结尾
+  - 语句相对于花括号缩进，为了代码格式清晰
+
+- 空语句就是直接使用一个分号**”;“**
+
+  - 可以用于创建空循环体
+
+    ```js
+    //初始化一个数组a
+    for(let i=0; i<a ; a[i++]=0);	//并不需要实际的循环体，此时可以使用空语句
+    ```
+
+    
+
+### 条件语句
+
+- **有条件控制语句if**
+
+  - ```js
+    if(expression)
+    	statement
+    ```
+
+    表达式执行，为真则执行statement语句，否则语句不会执行
+
+  - ```js
+    if(expression)
+    	statement_1
+    else
+    	statement_2
+    ```
+
+    表达式执行，为真则执行statement_1，否则执行statement_2
+
+- **多条件控制语句if-else**
+
+  - ```js
+    if(expression_1){
+    	statement_1
+    }else if(expression_2){
+    	statement_2
+    }
+    ...
+    else{
+    	statement_n
+    }
+    ```
+
+### 分支语句
+
+在所有分析都依赖同一个表达式值的时候使用**if-else**并不是最好的解决方案，应当使用**switch**
+
+```js
+switch(expression){
+	case val_1:{
+		...
+        break;		//退出匹配
+	}
+	case val_2{
+		...
+        break;
+	}	
+	...
+	default:{
+		...
+        break;
+	}
+}
+```
+
+switch语句计算expression的值然后**从上到下逐个和case后的值比对（使用===全等匹配）**
+
+运行匹配到的case条件后的语句，然后我们习惯**使用break退出匹配**，在函数中还可以使用return
+
+如果所有的case**都没有匹配到，则运行default后代码**，default标签常写在最后一个case后，但实际上可以出现在switch语句体的任意位置
+
+### 循环语句
+
+JavaScript有五种循环语句：while / do-while / for / for-of（for-await） / for-in / 
+
+- **while**，只要满足expression值为真则继续循环体（先求值）
+
+  - ```
+    while(expression){
+    	...
+    }
+    ```
+
+- 
