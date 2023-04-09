@@ -1738,4 +1738,120 @@ JavaScript有五种循环语句：while / do-while / for / for-of（for-await）
     }
     ```
 
-- 
+
+
+
+
+## 第十六章 Node服务器端javaScript
+
+node是**javaScript与底层操作系统绑定的结合**
+
+node的典型特点是由其**异步的API赋能的单线程基于事件的并发能力**
+
+### Node编程基础
+
+- **控制台输出**
+
+```js
+console.log()	//向标准输出流（stdout）发送输出的一种主要方式
+console.error()	//向标准错误流（stderr）
+console.warn()
+```
+
+
+
+- **命令行参数和环境变量**
+
+node可以从字符串数组process.argv中读取其命令行参数
+
+1. 这个数组的第一个元素始终是**node可执行文件的路径**，
+
+2. 第二个参数是**node执行的javaScript代码文件的路径**
+
+以上两者是**完全限定的文件系统路径**
+
+3. **剩余其他数组元素都是参数**
+
+
+
+- **环境变量**
+
+node将环境变量保存在process.env对象中使用
+
+
+
+- **程序生命周期**
+
+node基本上是**自顶向下执行**指定文件中的javaScript代码
+
+node程序通常是**异步的，并且基于回调和事件处理程序**
+
+基于node的而服务器监听到来的网络连接理论上永远运行，因为始终要等待下一个事件
+
+**调用process.exit()强制退出**
+
+程序抛出异常的处理，由于node原生异步，发生在回调或事件处理中的异常必须局部处理，可以注册全局处理程序
+
+```js
+process.setUncaughtExceptionCaptureCallback(e=>{
+	console.error("Uncaught exception:",e);
+})
+```
+
+若是一个Promise被拒绝
+
+```
+process.on("unHandleRjection"),(reason,promise)=>{
+	//reason 会传递给.catch()函数的拒绝理由
+	//promise 被拒绝的期约对象
+})
+```
+
+
+
+- **node模块**
+
+node模块又叫commonjs模块
+
+使用require()函数向模块中导入值，使用exports对象或module.exports属性导出值
+
+**使用node模块需要让它知道加载的是什么模块**
+
+1. 将信息编码到不同的扩展名中
+
+```
+xxx.mjs	//node将他视作es6模块加载
+xxx.cjs	//commonjs
+```
+
+不同模块使用其对应的文件导入导出方式，否则报错
+
+！！！node允许es6模块使用import关键字加载commonjs模块，反之不可
+
+2. 在package.json中指定
+
+```
+//node检查文件中的顶级type属性
+type:"module"	//es6
+type:"commonjs"	//commonjs
+```
+
+
+
+- **node默认异步**
+
+Node是针对I/O密集型程序进行设计和优化的
+
+Node通过让其API默认异步和非阻塞实现了高层次的并发，同时保持了单线程的编程模型
+
+node使用错误在先的回调，让你不可能忽略它
+
+```
+fs.readFile(path,"utf-8",(err,text)=>{
+    if(err){
+    ...
+    }
+    ...
+})
+```
+
